@@ -1,0 +1,15 @@
+</IfModule>
+
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
+Header add Set-Cookie "ROUTEID=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
+<Proxy balancer://MPMcluster>
+        BalancerMember http://172.24.50.27:8081 route=1 loadfactor=1
+        BalancerMember http://172.24.50.28:8081 route=2 loadfactor=1
+ProxySet stickysession=ROUTEID
+</Proxy>
+
+ProxyPreserveHost On
+ProxyPass / balancer://MPMcluster/ lbmethod=byrequests
+
+#ProxyPass /balancer-manager !
